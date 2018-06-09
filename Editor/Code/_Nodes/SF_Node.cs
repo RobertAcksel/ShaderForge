@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using System;
+using System.Globalization;
 
 
 namespace ShaderForge {
@@ -2358,157 +2359,165 @@ namespace ShaderForge {
 		// n:type:SFN_Multiply,id:8,x:33794,y:32535|1-9-0,2-7-0;
 		// Deserialize is in SF_Parser
 		public string Serialize(bool skipExternalLinks = false, bool useSuffixPrefix = false) {
-			
-			string s = "";
-			if(useSuffixPrefix)
-				s = "n:";
+			var currentCulture = CultureInfo.CurrentCulture;
+			CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+			try {
+				string s = "";
+				if(useSuffixPrefix)
+					s = "n:";
 
 
-			s += "type:" + this.GetType().ToString() + ",";
-			s += "id:" + this.id + ",";
-			s += "x:" + (int)rect.x + ",";
-			s += "y:" + (int)rect.y;
-			if(IsProperty()){
-				s += ",ptovrint:" + property.overrideInternalName;
-				s += ",ptlb:" + property.nameDisplay;
-				s += ",ptin:" + property.nameInternal;
-			}
-			if(HasComment())
-				s += ",cmnt:" + comment;
-			if(!string.IsNullOrEmpty(variableName) && !lockedVariableName){
-				s += ",varname:" + variableName;
-			}
-			if(isFloatPrecisionBasedVariable)
-				s += ",prsc:" + (int)precision;
-			
-			
-			//
-			string specialData = SerializeSpecialData(); // <-- This is the unique data for each node
-			if( !string.IsNullOrEmpty( specialData ) ) {
-				s += "," + specialData;
-			}
-			//
-
-			if( HasAnyInputConnected(skipExternalLinks) ) {
-				s += "|";
-				int linkCount = 0;
-				int i = 0;
-				foreach( SF_NodeConnector con in connectors ) { // List connections, connected inputs only
-					if( con.conType == ConType.cOutput ) { i++; continue; }
-					if( !con.IsConnected() ) { i++; continue; }
-					
-					if(skipExternalLinks)
-						if(!con.inputCon.node.selected){ i++; continue; }
-
-
-					string link = con.GetIndex() + "-" + connectors[i].inputCon.node.id + "-" + connectors[i].inputCon.GetIndex();
-
-					if( linkCount > 0 )
-						s += ",";
-					s += link;
-
-					linkCount++;
-					i++;
+				s += "type:" + this.GetType().ToString() + ",";
+				s += "id:" + this.id + ",";
+				s += "x:" + (int)rect.x + ",";
+				s += "y:" + (int)rect.y;
+				if(IsProperty()){
+					s += ",ptovrint:" + property.overrideInternalName;
+					s += ",ptlb:" + property.nameDisplay;
+					s += ",ptin:" + property.nameInternal;
 				}
-			}
+				if(HasComment())
+					s += ",cmnt:" + comment;
+				if(!string.IsNullOrEmpty(variableName) && !lockedVariableName){
+					s += ",varname:" + variableName;
+				}
+				if(isFloatPrecisionBasedVariable)
+					s += ",prsc:" + (int)precision;
 			
-			if(useSuffixPrefix)
-				s += ";";
+			
+				//
+				string specialData = SerializeSpecialData(); // <-- This is the unique data for each node
+				if( !string.IsNullOrEmpty( specialData ) ) {
+					s += "," + specialData;
+				}
+				//
 
-			return s;
+				if( HasAnyInputConnected(skipExternalLinks) ) {
+					s += "|";
+					int linkCount = 0;
+					int i = 0;
+					foreach( SF_NodeConnector con in connectors ) { // List connections, connected inputs only
+						if( con.conType == ConType.cOutput ) { i++; continue; }
+						if( !con.IsConnected() ) { i++; continue; }
+					
+						if(skipExternalLinks)
+							if(!con.inputCon.node.selected){ i++; continue; }
+
+
+						string link = con.GetIndex() + "-" + connectors[i].inputCon.node.id + "-" + connectors[i].inputCon.GetIndex();
+
+						if( linkCount > 0 )
+							s += ",";
+						s += link;
+
+						linkCount++;
+						i++;
+					}
+				}
+			
+				if(useSuffixPrefix)
+					s += ";";
+
+				return s;
+			} finally {
+				CultureInfo.CurrentCulture = currentCulture;
+			}
 		}
 
 		// This is the data per-node
 		// n:type:SFN_Final,id:6,x:33383,y:32591|0-8-0;
 		public static SF_Node Deserialize( string row, ref List<SF_Link> linkList) {
-			
-			
-			bool isLinked = row.Contains( "|" );
-			
-			string linkData = "";
-			
-			// Grab connections, if any, and remove them from the main row
-			if( isLinked ) {
-				string[] split = row.Split( '|' );
-				row = split[0];
-				linkData = split[1];
-			}
-			
-			
-			string[] nData = row.Split( ',' ); // Split the node data
-			SF_Node node = null;
-			
-			// This is the data in a single node, without link information
-			// type:SFN_Final,id:6,x:33383,y:32591
-			foreach( string s in nData ) {
-				if(SF_Debug.deserialization)
-					Debug.Log("Deserializing node: " + s);
-				string[] split = s.Split( ':' );
-				if (split.Length != 2) {
-					Debug.LogError($"Unable to deserialize value in shader '??' with value '{row}'");
-					continue;
-				}
-
-				string dKey = split[0];
-				string dValue = split[1];
+			var currentCulture = CultureInfo.CurrentCulture;
+			CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+			try {
+				bool isLinked = row.Contains( "|" );
 				
-				switch( dKey ) {
-				case "type":
-					//Debug.Log( "Deserializing " + dValue );
-					node = TryCreateNodeOfType( dValue );
-					if( node == null ) {
-						if(SF_Debug.dynamicNodeLoad)
-							Debug.LogError( "Node not found, returning..." );
-						return null;
-					}
-					break;
-				case "id":
-					node.id = int.Parse( dValue );
-					break;
-				case "x":
-					node.rect.x = int.Parse( dValue );
-					break;
-				case "y":
-					node.rect.y = int.Parse( dValue );
-					break;
-				case "ptovrint":
-					node.property.overrideInternalName = bool.Parse(dValue);
-					break;
-				case "ptlb":
-					node.property.SetName( dValue );
-					break;
-				case "ptin":
-					node.property.nameInternal = dValue;
-					break;
-				case "cmnt":
-					node.comment = dValue;
-					break;
-				case "varname":
-					node.variableName = dValue;
-					break;
-				case "prsc":
-					node.precision = (FloatPrecision)int.Parse(dValue);
-					break;
-				default:
-					//Debug.Log("Deserializing KeyValue: " +dKey + " v: " + dValue);
-					node.DeserializeSpecialData( dKey, dValue );
-					break;
+				string linkData = "";
+				
+				// Grab connections, if any, and remove them from the main row
+				if( isLinked ) {
+					string[] split = row.Split( '|' );
+					row = split[0];
+					linkData = split[1];
 				}
-			}
-			
-			// Add links to link data, if it's connected
-			if( isLinked ) {
-				string[] parsedLinks = linkData.Split( ',' );
-				foreach( string s in parsedLinks )
-					linkList.Add( new SF_Link( node.id, s ) );
-			}
+				
+				
+				string[] nData = row.Split( ',' ); // Split the node data
+				SF_Node node = null;
+				
+				// This is the data in a single node, without link information
+				// type:SFN_Final,id:6,x:33383,y:32591
+				foreach( string s in nData ) {
+					if(SF_Debug.deserialization)
+						Debug.Log("Deserializing node: " + s);
+					string[] split = s.Split( ':' );
+					if (split.Length != 2) {
+						Debug.LogError($"Unable to deserialize value in shader '??' with value '{row}'");
+						continue;
+					}
 
-			// Update image if needed
-			node.GenerateBaseData();
-			
-			
-			return node;
-			
+					string dKey = split[0];
+					string dValue = split[1];
+					
+					switch( dKey ) {
+					case "type":
+						//Debug.Log( "Deserializing " + dValue );
+						node = TryCreateNodeOfType( dValue );
+						if( node == null ) {
+							if(SF_Debug.dynamicNodeLoad)
+								Debug.LogError( "Node not found, returning..." );
+							return null;
+						}
+						break;
+					case "id":
+						node.id = int.Parse( dValue );
+						break;
+					case "x":
+						node.rect.x = int.Parse( dValue );
+						break;
+					case "y":
+						node.rect.y = int.Parse( dValue );
+						break;
+					case "ptovrint":
+						node.property.overrideInternalName = bool.Parse(dValue);
+						break;
+					case "ptlb":
+						node.property.SetName( dValue );
+						break;
+					case "ptin":
+						node.property.nameInternal = dValue;
+						break;
+					case "cmnt":
+						node.comment = dValue;
+						break;
+					case "varname":
+						node.variableName = dValue;
+						break;
+					case "prsc":
+						node.precision = (FloatPrecision)int.Parse(dValue);
+						break;
+					default:
+						//Debug.Log("Deserializing KeyValue: " +dKey + " v: " + dValue);
+						node.DeserializeSpecialData( dKey, dValue );
+						break;
+					}
+				}
+				
+				// Add links to link data, if it's connected
+				if( isLinked ) {
+					string[] parsedLinks = linkData.Split( ',' );
+					foreach( string s in parsedLinks )
+						linkList.Add( new SF_Link( node.id, s ) );
+				}
+
+				// Update image if needed
+				node.GenerateBaseData();
+				
+				
+				return node;
+			} finally {
+				CultureInfo.CurrentCulture = currentCulture;
+			}
 		}
 
 

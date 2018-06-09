@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
+using System.Globalization;
 
 namespace ShaderForge {
 
@@ -63,19 +64,19 @@ namespace ShaderForge {
 		public override void DeserializeSpecialData( string key, string value ) {
 			switch( key ) {
 				case "v1":
-					float fVal1 = float.Parse( value );
+					float fVal1 = float.Parse( value, NumberFormatInfo.InvariantInfo );
 					texture.dataUniform[0] = fVal1;
 					break;
 				case "v2":
-					float fVal2 = float.Parse( value );
+					float fVal2 = float.Parse( value, NumberFormatInfo.InvariantInfo );
 					texture.dataUniform[1] = fVal2;
 					break;
 				case "v3":
-					float fVal3 = float.Parse( value );
+					float fVal3 = float.Parse( value, NumberFormatInfo.InvariantInfo );
 					texture.dataUniform[2] = fVal3;
 					break;
 				case "v4":
-					float fVal4 = float.Parse( value );
+					float fVal4 = float.Parse( value, NumberFormatInfo.InvariantInfo );
 					texture.dataUniform[3] = fVal4;
 					break;
 			}
