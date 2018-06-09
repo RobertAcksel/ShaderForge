@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
+using System.Globalization;
+
 //using System;
 
 namespace ShaderForge {
@@ -92,7 +94,7 @@ namespace ShaderForge {
 
 
 		public override string Evaluate( OutChannel channel = OutChannel.All ) {
-			return "lerp(" + lerp_a + "," + lerp_b + "," + GetConnectorByStringID( "IN" ).TryEvaluate() + ")";
+			return "lerp(" + lerp_a.ToString(CultureInfo.InvariantCulture) + ", " + lerp_b.ToString(CultureInfo.InvariantCulture) + ", " + GetConnectorByStringID( "IN" ).TryEvaluate() + ")";
 		}
 
 		public override float EvalCPU( int c ) {
