@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Globalization;
 
 namespace ShaderForge {
 
@@ -17,7 +18,7 @@ namespace ShaderForge {
 
 
 		public override string GetInitializationLine() {
-			return GetTagString() + GetVariable() + " (\"" + nameDisplay + "\", Vector) = (" + GetValue().r + "," + GetValue().g + "," + GetValue().b + "," + GetValue().a + ")";
+			return GetTagString() + GetVariable() + " (\"" + nameDisplay + "\", Vector) = (" + GetValue().r.ToString(CultureInfo.InvariantCulture) + "," + GetValue().g.ToString(CultureInfo.InvariantCulture) + "," + GetValue().b.ToString(CultureInfo.InvariantCulture) + "," + GetValue().a.ToString(CultureInfo.InvariantCulture) + ")";
 		}
 
 		Color GetValue() {
