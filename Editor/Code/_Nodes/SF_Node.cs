@@ -2444,6 +2444,11 @@ namespace ShaderForge {
 				if(SF_Debug.deserialization)
 					Debug.Log("Deserializing node: " + s);
 				string[] split = s.Split( ':' );
+				if (split.Length != 2) {
+					Debug.LogError($"Unable to deserialize value in shader '??' with value '{row}'");
+					continue;
+				}
+
 				string dKey = split[0];
 				string dValue = split[1];
 				

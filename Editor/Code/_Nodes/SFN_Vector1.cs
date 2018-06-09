@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
+using System.Globalization;
 
 namespace ShaderForge {
 
@@ -35,7 +36,7 @@ namespace ShaderForge {
 
 		public override string Evaluate( OutChannel channel = OutChannel.All ) {
 
-			string str = texture.dataUniform[0].ToString( "0.0###########" ); // At least one decimal
+			string str = texture.dataUniform[0].ToString( "0.0###########", CultureInfo.InvariantCulture ); // At least one decimal
 
 			if( texture.dataUniform[0] < 0f)
 				return "("+str+")";

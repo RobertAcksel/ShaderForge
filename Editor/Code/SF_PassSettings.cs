@@ -35,7 +35,12 @@ namespace ShaderForge {
 		public void Deserialize(string s) {
 			string[] split = s.Split(',');
 			for( int i = 0; i < split.Length; i++ ) {
-				string[] keyval = split[i].Split(':');
+				var value = split[i];
+				string[] keyval = value.Split(':');
+				if (keyval.Length != 2) {
+					Debug.LogError($"Unable to deserialize value in shader '{name}' at index '{i}' with value '{value}'");
+					continue;
+				}
 				Deserialize( keyval[0], keyval[1] );
 			}
 		}
