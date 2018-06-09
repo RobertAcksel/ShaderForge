@@ -31,7 +31,7 @@ namespace ShaderForge {
 		}
 
 		public override string Evaluate( OutChannel channel = OutChannel.All ) {
-			return "float2( _ScreenParams.z-1, _ScreenParams.w-1 )";
+			return "float2( _ScreenParams.z - 1, _ScreenParams.w - 1 )";
 		}
 
 	}

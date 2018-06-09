@@ -21,9 +21,9 @@ namespace ShaderForge {
 		}
 
 		public override string[] GetBlitOutputLines() {
-			string dotLeft = "_b * dot(_a,_b)";
-			string dotRight = "dot(_b,_b)";
-			string retStr = "(" + dotLeft + "/" + dotRight + ")";
+			string dotLeft = "_b * dot(_a, _b)";
+			string dotRight = "dot(_b, _b)";
+			string retStr = "(" + dotLeft + " / " + dotRight + ")";
 			return new string[] { retStr };
 		}
 
@@ -32,10 +32,10 @@ namespace ShaderForge {
 			string a = GetConnectorByStringID( "A" ).TryEvaluate();
 			string b = GetConnectorByStringID( "B" ).TryEvaluate();
 
-			string dotLeft = b + " * dot(" + a + "," + b + ")";
-			string dotRight = "dot(" + b + "," + b + ")";
+			string dotLeft = b + " * dot(" + a + ", " + b + ")";
+			string dotRight = "dot(" + b + ", " + b + ")";
 
-			string retStr = "(" + dotLeft + "/" + dotRight + ")";
+			string retStr = "(" + dotLeft + " / " + dotRight + ")";
 			
 			return retStr;
 		}

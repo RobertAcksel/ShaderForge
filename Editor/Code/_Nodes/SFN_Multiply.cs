@@ -45,9 +45,9 @@ namespace ShaderForge {
 			
 			string evalStr = "";
 			
-			evalStr += GetConnectorByStringID( "A" ).TryEvaluate() + "*" + GetConnectorByStringID( "B" ).TryEvaluate();
+			evalStr += GetConnectorByStringID( "A" ).TryEvaluate() + " * " + GetConnectorByStringID( "B" ).TryEvaluate();
 
-			ChainAppendIfConnected(ref evalStr, "*", "C", "D", "E");
+			ChainAppendIfConnected(ref evalStr, " * ", "C", "D", "E");
 			
 			return "(" + evalStr + ")";
 		}

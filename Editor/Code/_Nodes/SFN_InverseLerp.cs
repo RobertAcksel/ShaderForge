@@ -35,7 +35,7 @@ namespace ShaderForge {
 		}
 
 		public override string[] GetBlitOutputLines() {
-			return new string[] { "((_v-_a)/(_b-_a))" };
+			return new string[] { "((_v - _a) / (_b - _a))" };
 		}
 
 		public override bool IsUniformOutput() {
@@ -52,7 +52,7 @@ namespace ShaderForge {
 			string b = GetConnectorByStringID( "B" ).TryEvaluateAs( GetEvaluatedComponentCount() );
 			string v = GetConnectorByStringID( "V" ).TryEvaluateAs( GetEvaluatedComponentCount() );
 
-			return "((" + v + "-" + a + ")/(" + b + "-" + a + "))";
+			return "((" + v + " - " + a + ") / (" + b + " - " + a + "))";
 		}
 		
 		public override float EvalCPU( int c ) {

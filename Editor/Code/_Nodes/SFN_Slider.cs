@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
+using System.Globalization;
 
 namespace ShaderForge {
 
@@ -141,9 +142,9 @@ namespace ShaderForge {
 
 		public override string SerializeSpecialData() {
 			string s = property.Serialize() + ",";
-			s += "min:" + min + ",";
-			s += "cur:" + current + ",";
-			s += "max:" + max;
+			s += "min:" + min.ToString(CultureInfo.InvariantCulture) + ",";
+			s += "cur:" + current.ToString(CultureInfo.InvariantCulture) + ",";
+			s += "max:" + max.ToString(CultureInfo.InvariantCulture);
 			return s;
 		}
 
@@ -151,14 +152,14 @@ namespace ShaderForge {
 			property.Deserialize( key, value );
 			switch( key ) {
 				case "min":
-					min = float.Parse( value );
+					min = float.Parse( value, CultureInfo.InvariantCulture );
 					break;
 				case "cur":
-					current = float.Parse( value );
+					current = float.Parse( value, CultureInfo.InvariantCulture );
 					OnValueChanged();
 					break;
 				case "max":
-					max = float.Parse( value );
+					max = float.Parse( value, CultureInfo.InvariantCulture );
 					break;
 			}
 		}

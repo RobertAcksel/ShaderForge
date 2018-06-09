@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Globalization;
 
 namespace ShaderForge {
 
@@ -18,9 +19,9 @@ namespace ShaderForge {
 
 
 		public override string GetInitializationLine() {
-			string defaultValue = GetCurrent().ToString();
+			string defaultValue = GetCurrent().ToString(CultureInfo.InvariantCulture);
 			// name ("display name", Range (min, max)) = number
-			return GetTagString() + GetVariable() + " (\"" + nameDisplay + "\", Range(" + GetMin() + ", " + GetMax() + ")) = " + defaultValue;
+			return GetTagString() + GetVariable() + " (\"" + nameDisplay + "\", Range(" + GetMin().ToString(CultureInfo.InvariantCulture) + ", " + GetMax().ToString(CultureInfo.InvariantCulture) + ")) = " + defaultValue;
 		}
 
 		float GetMin() {

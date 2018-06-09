@@ -42,7 +42,7 @@ namespace ShaderForge {
 		}
 		
 		public override string Evaluate( OutChannel channel = OutChannel.All ) {
-			return "lerp(" + GetConnectorByStringID( "A" ).TryEvaluateAs(GetEvaluatedComponentCount()) + "," + GetConnectorByStringID( "B" ).TryEvaluateAs(GetEvaluatedComponentCount()) + "," + GetInputCon( "T" ).Evaluate() + ")";
+			return "lerp(" + GetConnectorByStringID( "A" ).TryEvaluateAs(GetEvaluatedComponentCount()) + ", " + GetConnectorByStringID( "B" ).TryEvaluateAs(GetEvaluatedComponentCount()) + ", " + GetInputCon( "T" ).Evaluate() + ")";
 		}
 		
 		public override float EvalCPU( int c ) {

@@ -37,7 +37,7 @@ namespace ShaderForge {
 		}
 
 		public override string[] GetBlitOutputLines() {
-			return new string[] { "pow(_val,_exp)" };
+			return new string[] { "pow(_val, _exp)" };
 		}
 
 		public override string Evaluate( OutChannel channel = OutChannel.All ) {

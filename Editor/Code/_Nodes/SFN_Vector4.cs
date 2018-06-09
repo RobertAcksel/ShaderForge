@@ -31,7 +31,7 @@ namespace ShaderForge {
 		}
 
 		public override string Evaluate( OutChannel channel = OutChannel.All ) {
-			return precision.ToCode() + "4(" + texture.dataUniform[0] + "," + texture.dataUniform[1] + "," + texture.dataUniform[2] + "," + texture.dataUniform[3] + ")";
+			return precision.ToCode() + "4(" + texture.dataUniform[0] + ", " + texture.dataUniform[1] + ", " + texture.dataUniform[2] + ", " + texture.dataUniform[3] + ")";
 		}
 
 

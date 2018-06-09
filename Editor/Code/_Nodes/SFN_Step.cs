@@ -18,7 +18,7 @@ namespace ShaderForge {
 		}
 
 		public override string Evaluate( OutChannel channel = OutChannel.All ) {
-			return "step(" + GetConnectorByStringID( "A" ).TryEvaluate() + "," + GetConnectorByStringID( "B" ).TryEvaluate() + ")";
+			return "step(" + GetConnectorByStringID( "A" ).TryEvaluate() + ", " + GetConnectorByStringID( "B" ).TryEvaluate() + ")";
 		}
 
 		public override float EvalCPU( int c ) {

@@ -35,7 +35,7 @@ namespace ShaderForge {
 		
 		public override string Evaluate( OutChannel channel = OutChannel.All ) {
 			string evalStr = "";
-			evalStr += "mul(" + GetConnectorByStringID( "A" ).TryEvaluate() + "," + GetConnectorByStringID( "B" ).TryEvaluate() + ")";
+			evalStr += "mul(" + GetConnectorByStringID( "A" ).TryEvaluate() + ", " + GetConnectorByStringID( "B" ).TryEvaluate() + ")";
 			return evalStr;
 		}
 

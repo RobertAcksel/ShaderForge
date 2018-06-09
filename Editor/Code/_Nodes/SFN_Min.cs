@@ -42,12 +42,12 @@ namespace ShaderForge {
 
 		public override string Evaluate( OutChannel channel = OutChannel.All ) {
 
-			string retStr = "min(" + TryEvalInput("A") + "," + TryEvalInput("B") + ")";
+			string retStr = "min(" + TryEvalInput("A") + ", " + TryEvalInput("B") + ")";
 
 			// Loop through all chain childs
 			foreach(SF_NodeConnector con in connectors){
 				if(con.IsConnected() && con.IsChild()){
-					retStr = "min(" + retStr + "," + con.TryEvaluate() + ")";
+					retStr = "min(" + retStr + ", " + con.TryEvaluate() + ")";
 				}
 			}
 

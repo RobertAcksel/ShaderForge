@@ -47,9 +47,9 @@ namespace ShaderForge {
 
 		public override string[] GetBlitOutputLines() {
 			return new string[] { 
-				"float2 s = _xy + 0.2127+_xy.x*0.3713*_xy.y;",
-				"float2 r = 4.789*sin(489.123*s);",
-				"frac(r.x*r.y*(1+s.x))"
+				"float2 s = _xy + 0.2127 + _xy.x * 0.3713 * _xy.y;",
+				"float2 r = 4.789 * sin(489.123 * s);",
+				"frac(r.x * r.y * (1 + s.x))"
 			};
 		}
 
@@ -60,15 +60,15 @@ namespace ShaderForge {
 			string s = Skew();
 
 			return new string[]{
-				"float2 "+s+" = "+p+" + 0.2127+"+p+".x*0.3713*"+p+".y;",
-				"float2 "+r+" = 4.789*sin(489.123*("+s+"));"
+				"float2 "+s+" = "+p+" + 0.2127+"+p+".x * 0.3713 * "+p+".y;",
+				"float2 "+r+" = 4.789 * sin(489.123 * ("+s+"));"
 			};
 		}
 
 		public override string Evaluate( OutChannel channel = OutChannel.All ) {
 			string r = Rnd();
 			string s = Skew();
-			return "frac("+r+".x*"+r+".y*(1+"+s+".x))";
+			return "frac("+r+".x * "+r+".y * (1 + "+s+".x))";
 		}
 
 		public override Vector4 EvalCPU() {

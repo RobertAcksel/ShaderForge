@@ -15,11 +15,11 @@ namespace ShaderForge {
 		}
 
 		public override string[] GetBlitOutputLines() {
-			return new string[] { "(-1*_in)" };
+			return new string[] { "(-1 * _in)" };
 		}
 
 		public override string Evaluate( OutChannel channel = OutChannel.All ) {
-			return "(-1*" + GetConnectorByStringID( "IN" ).TryEvaluate() + ")";
+			return "(-1 * " + GetConnectorByStringID( "IN" ).TryEvaluate() + ")";
 		}
 
 		public override float EvalCPU( int c ) {
