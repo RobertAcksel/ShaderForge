@@ -959,10 +959,28 @@ namespace ShaderForge {
 			if( SF_Evaluator.inVert && ps.catLighting.IsVertexLit() && ShouldUseLightMacros() )
 				App( "TRANSFER_VERTEX_TO_FRAGMENT(o)" );
 
-			string atten = "LIGHT_ATTENUATION(" + ( ( currentProgram == ShaderProgram.Frag ) ? "i" : "o" ) + ")";
+#if  UNITY_2018_1_OR_NEWER
+			if(!ShouldUseLightMacros()) {
+				App( "float attenuation = 1;" );
+			} else {
+				string input;
+				switch(currentProgram) {
+					case ShaderProgram.Frag:
+						input = "i, i.pos.xyz";
+						break;
+					default:
+						input = "o, o.pos.xyz";
+						break;
+				}
 
+				string atten = "UNITY_LIGHT_ATTENUATION(attenuation, " + input + ")";
+				App( atten + ";" );
+			}
+#else
+			string atten = "LIGHT_ATTENUATION(" + ( ( currentProgram == ShaderProgram.Frag ) ? "i" : "o" ) + ")";
 			string inner = ( ShouldUseLightMacros() ? atten : "1" );
 			App( "float attenuation = " + inner + ";" );
+#endif
 			if( ps.catLighting.lightMode != SFPSC_Lighting.LightMode.Unlit )
 				App( "float3 attenColor = attenuation * _LightColor0.xyz;" );
 		}

@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
+using System.Globalization;
+
 //using System;
 
 namespace ShaderForge {
@@ -114,7 +116,7 @@ namespace ShaderForge {
 
 		public override string Evaluate( OutChannel channel = OutChannel.All ) {
 			string distEval = this["DIST"].TryEvaluate();
-			return "(" + GetInputCon( "UVIN" ).Evaluate() + "+" + distEval + "*float2(" + speed.x + "," + speed.y + "))";
+			return "(" + GetInputCon( "UVIN" ).Evaluate() + "+" + distEval + "*float2(" + speed.x.ToString(CultureInfo.InvariantCulture) + "," + speed.y.ToString(CultureInfo.InvariantCulture) + "))";
 		}
 
 		// TODO Expose more out here!

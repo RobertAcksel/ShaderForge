@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Globalization;
 
 namespace ShaderForge {
 
@@ -13,7 +14,7 @@ namespace ShaderForge {
 		}
 
 		public override string GetInitializationLine() {
-			string defaultValue = base.node.texture.dataUniform.x.ToString();
+			string defaultValue = base.node.texture.dataUniform.x.ToString(CultureInfo.InvariantCulture);
 			return GetTagString() + "[MaterialToggle] " + GetVariable() + " (\"" + nameDisplay + "\", Float ) = " + defaultValue;
 		}
 
