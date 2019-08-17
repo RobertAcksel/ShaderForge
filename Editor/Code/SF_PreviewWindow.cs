@@ -3,12 +3,19 @@ using UnityEditor;
 using System.Collections;
 using System.Reflection;
 using System;
+#if UNITY_2019_3_OR_NEWER
+using UnityEditor.SceneManagement;
+using UnityEngine.SceneManagement;
+#endif
 
 namespace ShaderForge {
 	[Serializable]
 	public class SF_PreviewWindow {
+#if UNITY_2019_3_OR_NEWER
+        private Scene previewScene;
+#endif
 
-		[SerializeField]
+        [SerializeField]
 		public SF_Editor editor;
 		[SerializeField]
 		public SF_PreviewSettings settings;
@@ -30,8 +37,6 @@ namespace ShaderForge {
 			}
 		}
 
-		[SerializeField]
-		public RenderTexture render; // TODO: Why is this separated from the RT itself?
 		[SerializeField]
 		GUIStyle previewStyle;
 		[SerializeField]
@@ -121,11 +126,12 @@ namespace ShaderForge {
 
 			previewIsSetUp = true;
 
-			// Create preview camera
-			GameObject camObj = new GameObject("Shader Forge Camera");
-			camObj.hideFlags = HideFlags.HideAndDontSave;
-			cam = camObj.AddComponent<Camera>();
-			cam.targetTexture = render;
+            if (prevRenderer == null)
+                prevRenderer = new PreviewRenderUtility();
+
+
+            // Create preview camera
+			cam = prevRenderer.camera;
 			cam.clearFlags = CameraClearFlags.SolidColor;
 			cam.renderingPath = RenderingPath.Forward;
 			cam.enabled = false;
@@ -133,31 +139,41 @@ namespace ShaderForge {
 			cam.cameraType = CameraType.Preview;
 			cam.fieldOfView = targetFOV;
 
-			// Make sure it only renders using DrawMesh, to make ignore the scene. This is a bit risky, due to using reflection :(
-			BindingFlags bfs = BindingFlags.Static | BindingFlags.NonPublic;
+#if !UNITY_2019_3_OR_NEWER
+            // Make sure it only renders using DrawMesh, to make ignore the scene. This is a bit risky, due to using reflection :(
+            BindingFlags bfs = BindingFlags.Static | BindingFlags.NonPublic;
 			Type[] args = new Type[]{ typeof(Camera) };
 			mSetCameraOnlyDrawMesh = typeof( Handles ).GetMethod( "SetCameraOnlyDrawMesh", bfs, null, args, null );
 			mSetCameraOnlyDrawMesh.Invoke( null, new object[]{ cam } );
+#endif
 
-			// Create pivot/transform to hold it
-			camPivot = new GameObject("Shader Forge Camera Pivot").transform;
+            // Create pivot/transform to hold it
+            camPivot = new GameObject("Shader Forge Camera Pivot").transform;
 			camPivot.gameObject.hideFlags = HideFlags.HideAndDontSave;
 			cam.clearFlags = CameraClearFlags.Skybox;
 			cam.transform.parent = camPivot;
 
-			// Create custom light sources
-			lights = new Light[] {
-				new GameObject("Light 0").AddComponent<Light>(),
-				new GameObject("Light 1").AddComponent<Light>()
-			};
+#if UNITY_2019_3_OR_NEWER
+            previewScene = EditorSceneManager.NewPreviewScene();
+//            EditorSceneManager.MoveGameObjectToScene(camObj.gameObject, previewScene);
+//            EditorSceneManager.MoveGameObjectToScene(camPivot.gameObject, previewScene);
+#endif
+            // Create custom light sources
+            lights = new Light[] {
+				prevRenderer.lights[0],
+                prevRenderer.lights[1]
+            };
 			for( int i = 0; i < lights.Length; i++ ) {
 				lights[i].gameObject.hideFlags = HideFlags.HideAndDontSave;
 				lights[i].type = LightType.Directional;
 				lights[i].lightmapBakeType = LightmapBakeType.Realtime;
 				lights[i].enabled = false;
+#if UNITY_2019_3_OR_NEWER
+//                EditorSceneManager.MoveGameObjectToScene(lights[i].gameObject, previewScene);
+#endif
 			}
 
-			lights[0].intensity = 1f;
+            lights[0].intensity = 1f;
 			lights[0].transform.rotation = Quaternion.Euler( 30f, 30f, 0f );
 			lights[1].intensity = 0.75f;
 			lights[1].color = new Color( 1f, 0.5f, 0.25f );
@@ -165,15 +181,17 @@ namespace ShaderForge {
 		}
 
 		void CleanupObjects() {
-			GameObject.DestroyImmediate( cam.gameObject );
 			GameObject.DestroyImmediate( camPivot.gameObject );
-			for( int i = 0; i < lights.Length; i++ ) {
-				GameObject.DestroyImmediate( lights[i].gameObject );
-			}
-		}
+#if UNITY_2019_3_OR_NEWER
+            EditorSceneManager.UnloadSceneAsync(previewScene);
+#endif
+            if (prevRenderer != null) {
+                prevRenderer.Cleanup();
+            }
+        }
 
 
-		public bool SkyboxOn{
+        public bool SkyboxOn{
 			get{
 				return cam.clearFlags == CameraClearFlags.Skybox;
 			}
@@ -331,8 +349,8 @@ namespace ShaderForge {
 		public bool MouseOverPreview() {
 			return previewRect.Contains( Event.current.mousePosition );
 		}
-	
-		[SerializeField]
+
+        [SerializeField]
 		Rect previewRect = new Rect(0f,0f,1f,1f);
 		public void DrawMeshGUI( Rect previewRect ) {
 
@@ -375,21 +393,10 @@ namespace ShaderForge {
 
 
 
-			bool makeNew = false;
-			if( render == null ) {
-				makeNew = true;
-			} else if( render.width != (int)previewRect.width || render.height != (int)previewRect.height ) {
-				RenderTexture.DestroyImmediate( render );
-				makeNew = true;
-			}
-
-			if( makeNew ) {
-				render = new RenderTexture( (int)previewRect.width, (int)previewRect.height, 24, RenderTextureFormat.ARGB32 );
-				render.antiAliasing = 8;
-			}
-
-			DrawMesh();
-			GL.sRGBWrite = ( QualitySettings.activeColorSpace == ColorSpace.Linear );
+            prevRenderer.BeginPreview(previewRect, GUIStyle.none);
+            DrawMesh();
+            var render = prevRenderer.EndPreview();
+            GL.sRGBWrite = ( QualitySettings.activeColorSpace == ColorSpace.Linear );
 			GUI.DrawTexture( previewRect, render, ScaleMode.StretchToFill, false );
 			GL.sRGBWrite = false;
 
@@ -405,13 +412,12 @@ namespace ShaderForge {
 			if( previewIsSetUp == false ) {
 				SetupPreview();
 			}
-			
 
-			// TODO: Override RT is used for screenshots, probably
-			if( overrideRT != null )
+            var render = cam.targetTexture;
+
+            // TODO: Override RT is used for screenshots, probably
+            if ( overrideRT != null )
 				cam.targetTexture = overrideRT;
-			else if( cam.targetTexture == null )
-				cam.targetTexture = render;
 
 			UpdateRenderPath();
 
@@ -435,7 +441,7 @@ namespace ShaderForge {
 
 			Material mat = (overrideMaterial == null) ? InternalMaterial : overrideMaterial;
 			for( int i=0; i < smCount; i++ ) {
-				Graphics.DrawMesh( drawMesh, Quaternion.identity * pos, Quaternion.identity, mat, 31, cam, i );
+                prevRenderer.DrawMesh(drawMesh, Quaternion.identity * pos, Quaternion.identity, mat, i);
 			}
 
 			cam.farClipPlane = 3f * meshExtents * 2f;
@@ -462,7 +468,8 @@ namespace ShaderForge {
 		float targetFOV = 30f;
 		[SerializeField]
 		float smoothFOV = 30f;
-		[SerializeField]
+        private PreviewRenderUtility prevRenderer;
+        [SerializeField]
 		const float maxFOV = 60f;
 
 		public void UpdateCameraZoom() {
@@ -498,9 +505,5 @@ namespace ShaderForge {
 				UnityEditorInternal.InternalEditorUtility.RemoveCustomLighting();
 			}
 		}
-
-
-
-
-	}
+    }
 }

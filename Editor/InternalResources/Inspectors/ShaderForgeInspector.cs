@@ -4,6 +4,8 @@ using UnityEngine;
 using System.Reflection;
 using ShaderForge;
 using System.Globalization;
+using System.Linq;
+using UnityEditor.Rendering;
 
 namespace UnityEditor {
 	[CustomEditor( typeof( Shader ) )]
@@ -104,7 +106,7 @@ namespace UnityEditor {
 			shinsp = Type.GetType( "UnityEditor.ShaderInspector, UnityEditor" );
 			shinspGetErrorListUI = shinsp.GetMethod( "ShaderErrorListUI", privStatic );
 
-			sutil = Type.GetType( "UnityEditor.ShaderUtil, UnityEditor" );
+            sutil = Type.GetType( "UnityEditor.ShaderUtil, UnityEditor" );
 			sutilHasShadowCasterPass = sutil.GetMethod( "HasShadowCasterPass", privStatic );
 			sutilGetRenderQueue = sutil.GetMethod( "GetRenderQueue", privStatic );
 			sutilGetLOD = sutil.GetMethod( "GetLOD", privStatic );
@@ -210,13 +212,12 @@ namespace UnityEditor {
 				GUILayout.EndHorizontal();
 			}
 
+#if UNITY_2019_3_OR_NEWER
+            DrawDefaultInspector();
+#else
 			DrawUnitysInspector();
-
-		}
-
-
-		
-
+#endif
+        }
 
 		public static void OpenCompiledShader(Shader s) {
 			
@@ -295,7 +296,7 @@ namespace UnityEditor {
                 this.ShowShaderErrors(s);
         }
 		private void ShowShaderErrors( Shader s ) {
-			int shaderErrorCount = (int)sutilGetShaderErrorCount.Invoke(null, new object[]{s} );
+            int shaderErrorCount = (int)sutilGetShaderErrorCount.Invoke(null, new object[]{s} );
 			if( shaderErrorCount < 1 ) {
 				return;
 			}
