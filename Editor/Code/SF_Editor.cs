@@ -8,8 +8,7 @@ using System.Xml;
 using System.Reflection;
 using System.Net;
 using System.Collections;
-
-
+using System.Runtime.CompilerServices;
 
 
 namespace ShaderForge {
@@ -113,7 +112,6 @@ namespace ShaderForge {
 		}
 
 		void OnDisable(){
-
 			if(shaderOutdated != UpToDateState.UpToDate){
 
 				fullscreenMessage = "Saving...";
@@ -125,9 +123,7 @@ namespace ShaderForge {
 				preview.OnDisable();
 
 			SF_Settings.SaveAllToDisk();
-
 		}
-
 
 		void OnDestroy(){
 			DestroyImmediate( preview.internalMaterial );
@@ -1952,7 +1948,8 @@ namespace ShaderForge {
 			}
 
 			string presetPath = GetShaderPresetPath( preset );
-			StreamReader presetReader = new StreamReader( Application.dataPath + presetPath.Substring( 6 ) );
+            var substring = Path.GetFullPath(presetPath);
+            StreamReader presetReader = new StreamReader( substring );
 
 			// So we now have the path to save it, let's save
 			StreamWriter sw;

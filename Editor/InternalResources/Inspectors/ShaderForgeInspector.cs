@@ -302,7 +302,7 @@ namespace UnityEditor {
 			}
 
 			object[] args = new object[] { s, sutilGetShaderErrors.Invoke( null, new object[] { s } ), this.m_ScrollPosition };
-			shinspGetErrorListUI.Invoke(null, args );
+//			shinspGetErrorListUI.Invoke(null, args );
 			// ShaderInspector.ShaderErrorListUI( s, ShaderUtil.GetShaderErrors( s ), ref this.m_ScrollPosition );
 			this.m_ScrollPosition  = (Vector2)args[2];
 		}

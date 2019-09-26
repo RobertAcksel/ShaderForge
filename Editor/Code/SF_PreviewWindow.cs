@@ -3,7 +3,7 @@ using UnityEditor;
 using System.Collections;
 using System.Reflection;
 using System;
-#if UNITY_2019_3_OR_NEWER
+#if UNITY_2019_2_OR_NEWER
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
 #endif
@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 namespace ShaderForge {
 	[Serializable]
 	public class SF_PreviewWindow {
-#if UNITY_2019_3_OR_NEWER
+#if UNITY_2019_2_OR_NEWER
         private Scene previewScene;
 #endif
 
@@ -139,7 +139,7 @@ namespace ShaderForge {
 			cam.cameraType = CameraType.Preview;
 			cam.fieldOfView = targetFOV;
 
-#if !UNITY_2019_3_OR_NEWER
+#if !UNITY_2019_2_OR_NEWER
             // Make sure it only renders using DrawMesh, to make ignore the scene. This is a bit risky, due to using reflection :(
             BindingFlags bfs = BindingFlags.Static | BindingFlags.NonPublic;
 			Type[] args = new Type[]{ typeof(Camera) };
@@ -153,7 +153,7 @@ namespace ShaderForge {
 			cam.clearFlags = CameraClearFlags.Skybox;
 			cam.transform.parent = camPivot;
 
-#if UNITY_2019_3_OR_NEWER
+#if UNITY_2019_2_OR_NEWER
             previewScene = EditorSceneManager.NewPreviewScene();
 //            EditorSceneManager.MoveGameObjectToScene(camObj.gameObject, previewScene);
 //            EditorSceneManager.MoveGameObjectToScene(camPivot.gameObject, previewScene);
@@ -168,7 +168,7 @@ namespace ShaderForge {
 				lights[i].type = LightType.Directional;
 				lights[i].lightmapBakeType = LightmapBakeType.Realtime;
 				lights[i].enabled = false;
-#if UNITY_2019_3_OR_NEWER
+#if UNITY_2019_2_OR_NEWER
 //                EditorSceneManager.MoveGameObjectToScene(lights[i].gameObject, previewScene);
 #endif
 			}
@@ -182,7 +182,7 @@ namespace ShaderForge {
 
 		void CleanupObjects() {
 			GameObject.DestroyImmediate( camPivot.gameObject );
-#if UNITY_2019_3_OR_NEWER
+#if UNITY_2019_2_OR_NEWER
             EditorSceneManager.UnloadSceneAsync(previewScene);
 #endif
             if (prevRenderer != null) {
