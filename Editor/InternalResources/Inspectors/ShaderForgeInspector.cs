@@ -295,8 +295,8 @@ namespace UnityEditor {
                 this.ShowShaderErrors(s);
         }
 		private void ShowShaderErrors( Shader s ) {
-			int shaderErrorCount = (int)sutilGetShaderErrorCount.Invoke(null, new object[]{s} );
-			if( shaderErrorCount < 1 ) {
+			int? shaderErrorCount = (int?)sutilGetShaderErrorCount?.Invoke(null, new object[]{s} );
+			if(!shaderErrorCount.HasValue || shaderErrorCount < 1 ) {
 				return;
 			}
 
